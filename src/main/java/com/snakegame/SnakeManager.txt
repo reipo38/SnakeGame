@@ -1,0 +1,203 @@
+package com.snakegame;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.layout.Pane;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+/*
+    This class manages the creation of every new node, updates their positions and images
+    the corresponding logic for the SnakeHead is handled in the SnakeHeadController class
+    This class also manages collisions between the head and the nodes, as well as between the apple and the nodes
+ */
+
+public class SnakeManager_ {
+
+    /*
+    These arraylists are used to keep
+     the positions of every single Parent object on the scene including the SnakeHead
+     the instances of every single Parent object deriving from SnakeNode
+     the controllers for every single SnakeNode
+     */
+    private final LinkedList<double[]> positions = new LinkedList<>();
+    private final LinkedList<Parent> nodes = new LinkedList<>();
+
+    /*
+    the controllers are used for updating the direction of the nodes
+    index i of nodeControllers corresponds to index i of nodes
+     */
+    private final LinkedList<SnakeNodeController> nodeControllers = new LinkedList<>();
+
+    private final Pane root;
+
+    //the snake head controller is used only to check for which direction the SnakeHead is looking in
+    //order to update the direction of the SnakeNode
+    private final SnakeHeadController headController;
+
+    //this variable is used to "queue" the creation of a new SnakeNode which is done after updating
+    //the position of every existing node
+    private boolean toSpawn = false;
+
+    public SnakeManager(Pane root, SnakeHeadController headController) {
+        this.root = root;
+        this.headController = headController;
+
+    }
+
+    public void spawnSnakeNode() {
+        //this method simply means that at the end of the main-loop when updateSnake() is called, it will
+        //create a new node
+        toSpawn = true;
+    }
+
+    private void updateSnakeNodes() throws IOException {
+        ListIterator<Parent> nodeIterator = nodes.listIterator();
+        ListIterator<double[]> posIterator = positions.listIterator(1);
+        ListIterator<SnakeNodeController> nodeControllerIterator = nodeControllers.listIterator();
+        SnakeNodeController prevNodeController = null;
+        SnakeNodeController currNodeController;
+        SnakeNodeController nextNodeController;
+        double[] position = null;
+        while (nodeIterator.hasNext()) {
+            position = posIterator.next();
+            setNodePosition(nodeIterator.next(), position);
+            nextNodeController = nodeControllerIterator.next();
+            currNodeController = nextNodeController;
+            if (prevNodeController != null) {
+                prevNodeController = currNodeController;
+            }
+            if (prevNodeController == null) {
+                prevNodeController = nextNodeController;
+            }
+            if (!nodeControllerIterator.hasNext()){
+                nextNodeController = null;
+            }
+            setNodeImageView(prevNodeController, currNodeController, nextNodeController);
+            prevNodeController = currNodeController;
+        }
+        if (toSpawn){
+            loadNode(position);
+            toSpawn = false;
+        }
+    }
+    public void updateSnake(Parent head) throws IOException {
+        positions.addFirst(new double[]{head.getLayoutX(), head.getLayoutY()});
+
+        updateSnakeNodes();
+        /*last position is removed only if size greater than 1
+        if size is greater than 1 this means one of two is true:
+            1.
+            there are no nodes.
+            it keeps the current(0) and previous(1) position of the Head.
+            The current will become previous in the next iteration of the main-loop
+            and might be used to create a new node, so we keep it
+            the previous now w        if (toSpawn) {
+            loadNode(positions.getLast());
+            toSpawn = false;
+        }ill not be used, so we discard it
+
+            2.
+            it keeps the positions of every node, including the previous pos of the last node,
+            we could have used it in this iteration to create a new node, but if not we discard it.
+         */
+        if (!toSpawn && positions.size() > 1) {
+            positions.removeLast();
+        }
+    }
+
+    private SnakeNodeController.turning resolveTurn(SnakeNodeController prevNodeController, SnakeNodeController currNodeController, SnakeNodeController nextNodeController) {
+
+        SnakeNodeController.turning turn = SnakeNodeController.turning.NONE;
+        boolean prevVert = prevNodeController.getVertical();
+        Parent prev = prevNodeController.getParent();
+        Parent curr = currNodeController.getParent();
+        Parent next = nextNodeController.getParent();
+
+        double diffX;
+        double diffY;
+
+        if (prevVert) {
+            diffX = next.getLayoutX() - curr.getLayoutX();
+            diffY = prev.getLayoutY() - curr.getLayoutY();
+        } else {
+            diffX = prev.getLayoutX() - curr.getLayoutX();
+            diffY = next.getLayoutY() - curr.getLayoutY();
+        }
+
+        if (diffX > 0) {
+            if (diffY > 0) {
+                //rightdown
+                turn = SnakeNodeController.turning.RIGHTDOWN;
+            } else {
+                //rightup
+                turn = SnakeNodeController.turning.RIGHTUP;
+            }
+        } else {
+            if (diffY > 0) {
+                //leftdown
+                turn = SnakeNodeController.turning.LEFTDOWN;
+            } else {
+                //leftup
+                turn = SnakeNodeController.turning.LEFTUP;
+            }
+        }
+        return turn;
+    }
+
+    private void setNodeImageView(SnakeNodeController prevNodeController, SnakeNodeController currNodeController, SnakeNodeController nextNodeController) {
+        if (prevNodeController == null) {
+            currNodeController.setTurn(SnakeNodeController.turning.NONE);
+            currNodeController.setVertical(headController.getDir() == SnakeHeadController.direction.UP || headController.getDir() == SnakeHeadController.direction.DOWN);
+        }
+        else if (nextNodeController != null){
+            SnakeNodeController.turning turn = SnakeNodeController.turning.NONE;
+            currNodeController.setVertical(prevNodeController.getParent().getLayoutY() - currNodeController.getParent().getLayoutY() != 0);
+            if (prevNodeController.getVertical() != nextNodeController.getVertical()){
+                turn = resolveTurn(prevNodeController, currNodeController, nextNodeController);
+            }
+            currNodeController.setTurn(turn);
+
+        }
+        else {
+            currNodeController.setTurn(SnakeNodeController.turning.NONE);
+            currNodeController.setVertical(prevNodeController.getVertical());
+        }
+        currNodeController.setImageView();
+    }
+
+    private void setNodePosition(Parent node, double[] newPos) {
+        node.setLayoutX(newPos[0]);
+        node.setLayoutY(newPos[1]);
+    }
+
+    private void loadNode(double[] newPos) throws IOException {
+        FXMLLoader nodeLoader = new FXMLLoader(getClass().getResource("/com/snakegame/SnakeNode.fxml"));
+        Parent node = nodeLoader.load();
+        SnakeNodeController nodeController = nodeLoader.getController();
+        SnakeNodeController prevNodeController  = nodeControllers.isEmpty() ? null : nodeControllers.getLast();
+        nodes.add(node);
+        nodeControllers.add(nodeController);
+        root.getChildren().add(node);
+
+        setNodePosition(node, newPos);
+        setNodeImageView(prevNodeController, nodeController, null);
+    }
+
+    public boolean isCollidingHeadAndNode(Parent head) {
+        for (Parent node : nodes) {
+            if (head.getLayoutX() == node.getLayoutX() && head.getLayoutY() == node.getLayoutY()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean containsPos(double[] pos) {
+        return positions.stream()
+                .anyMatch(arr -> Arrays.equals(arr, pos));
+    }
+}
