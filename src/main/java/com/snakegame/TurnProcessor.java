@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class TurnProcessor {
-    private final NodeManager snakeManager = new NodeManager();
+    private final SnakeNodeManager snakeNodeManager = new SnakeNodeManager();
     private final MainScene mainScene;
 
     private final ImageView apple;
@@ -19,7 +19,7 @@ public class TurnProcessor {
     public TurnProcessor(MainScene mainScene) {
         this.mainScene = mainScene;
         this.headController = this.mainScene.getHeadController();
-        snakeManager.setRoot(mainScene.getRoot());
+        snakeNodeManager.setRoot(mainScene.getRoot());
         apple = this.mainScene.getApple();
         head = this.mainScene.getHead();
         counterController = this.mainScene.getCounterController();
@@ -27,9 +27,11 @@ public class TurnProcessor {
     private boolean isAppleEaten() {
         return (head.getLayoutX() == apple.getLayoutX() && head.getLayoutY() == apple.getLayoutY());
     }
-
+    private boolean isCollidingWithBorder(){
+        return head.getLayoutX() < 0 || head.getLayoutX() >= 600 || head.getLayoutY() < 80 || head.getLayoutY() >= 680;
+    }
     private boolean containsPos(double[] pos) {
-        return snakeManager.getPositions().stream()
+        return snakeNodeManager.getPositions().stream()
                 .anyMatch(arr -> Arrays.equals(arr, pos));
     }
 
@@ -45,15 +47,15 @@ public class TurnProcessor {
         apple.setLayoutX(x);
         apple.setLayoutY(y);
     }
-    public boolean processTurn(Parent head) throws IOException {
+    public boolean processTurn() throws IOException {
 
         head.setLayoutX(Math.round((head.getLayoutX() + 60 * headController.getX()) / 10.0f)*10);
         head.setLayoutY(Math.round((head.getLayoutY() + 60 * headController.getY()) / 10.0f)*10);
 
-        snakeManager.addFirstPosition(new double[]{head.getLayoutX(), head.getLayoutY()});
-        snakeManager.setCurrHeadDirection(headController.getDir());
+        snakeNodeManager.addFirstPosition(new double[]{head.getLayoutX(), head.getLayoutY()});
+        snakeNodeManager.setCurrHeadDirection(headController.getDir());
 
-        if (!snakeManager.updateSnake() || head.getLayoutX() < 0 || head.getLayoutX() >= 600 || head.getLayoutY() < 80 || head.getLayoutY() >= 680){
+        if (!snakeNodeManager.updateNodes() || isCollidingWithBorder()){
             head.setLayoutX(head.getLayoutX() - 60 * headController.getX());
             head.setLayoutY(head.getLayoutY() - 60 * headController.getY());
             mainScene.gameOver();
@@ -63,7 +65,7 @@ public class TurnProcessor {
         if (isAppleEaten()) {
             changeAppleLocation();
             counterController.updateScore();
-            snakeManager.spawnSnakeNode();
+            snakeNodeManager.spawnNode();
         }
         return true;
     }

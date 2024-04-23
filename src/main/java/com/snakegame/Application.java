@@ -2,7 +2,6 @@ package com.snakegame;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
@@ -20,13 +19,12 @@ public class Application extends javafx.application.Application {
         this.stage = stage;
         startMainloop();
     }
-    private void startMainloop() throws IOException{
+
+    private void startMainloop() throws IOException {
 
         MainScene mainScene = new MainScene();
         Scene scene = new Scene(mainScene.getRoot(), 600, 680);
-        Parent head = mainScene.getHead();
         SnakeHeadController headController = mainScene.getHeadController();
-
 
         Button resetButton = new Button("Start Again");
         resetButton.setOnAction(event -> {
@@ -39,23 +37,21 @@ public class Application extends javafx.application.Application {
 
         TurnProcessor turnProcessor = new TurnProcessor(mainScene);
 
-
         stage.setTitle("The Snake Game");
         stage.setScene(scene);
         stage.show();
         timeline = new Timeline(
-
                 new KeyFrame(Duration.seconds(0.70), event -> {
 
                     headController.unlockMovement();
                     scene.setOnKeyPressed(headController::handleKeyPressed);
 
                     try {
-                        if (!turnProcessor.processTurn(head)){
-                          stopTimeline();
-                          mainScene.getRoot().getChildren().add(resetButton);
-                          resetButton.setLayoutX(230);
-                          resetButton.setLayoutY(40);
+                        if (!turnProcessor.processTurn()) {
+                            stopTimeline();
+                            mainScene.getRoot().getChildren().add(resetButton);
+                            resetButton.setLayoutX(230);
+                            resetButton.setLayoutY(40);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -69,11 +65,13 @@ public class Application extends javafx.application.Application {
     public static boolean isTimelineStopped() {
         return isTimelineStopped;
     }
+
     private void stopTimeline() {
         timeline.stop();
         isTimelineStopped = true;
     }
-    private void resetApplication() throws IOException{
+
+    private void resetApplication() throws IOException {
         startMainloop();
         isTimelineStopped = false;
     }
