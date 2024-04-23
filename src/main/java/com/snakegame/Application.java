@@ -5,12 +5,10 @@ import javafx.animation.Timeline;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.util.Random;
 
 public class Application extends javafx.application.Application {
     private Timeline timeline;
@@ -27,9 +25,7 @@ public class Application extends javafx.application.Application {
         MainScene mainScene = new MainScene();
         Scene scene = new Scene(mainScene.getRoot(), 600, 680);
         Parent head = mainScene.getHead();
-        ImageView apple = mainScene.getApple();
         SnakeHeadController headController = mainScene.getHeadController();
-        CounterController counterController = mainScene.getCounterController();
 
         head.setLayoutX(0);
         head.setLayoutY(620);
@@ -43,11 +39,8 @@ public class Application extends javafx.application.Application {
             }
         });
 
-        SnakeManager mngr = new SnakeManager(mainScene.getRoot(), headController);
+        TurnProcessor turnProcessor = new TurnProcessor(mainScene);
 
-        //changeAppleLocation() takes mngr because it needs to access its containsPos() method in order
-        //to not place the apple on Nodes.
-        changeAppleLocation(apple, mngr);
 
         stage.setTitle("The Snake Game");
         stage.setScene(scene);
@@ -68,27 +61,15 @@ public class Application extends javafx.application.Application {
                     scene.setOnKeyPressed(headController::handleKeyPressed);
 
                     try {
-                        mngr.updateSnake(head);
+                        if (!turnProcessor.processTurn(head)){
+                          stopTimeline();
+                          mainScene.getRoot().getChildren().add(resetButton);
+                          resetButton.setLayoutX(230);
+                          resetButton.setLayoutY(40);
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-
-                    if (isCollidingHeadAndApple(head, apple)) {
-                        changeAppleLocation(apple, mngr);
-                        counterController.updateScore();
-                        mngr.spawnSnakeNode();
-                    }
-
-                    if (head.getLayoutX() < 0 || head.getLayoutX() >= 600 || head.getLayoutY() < 80 || head.getLayoutY() >= 680 || mngr.isCollidingHeadAndNode(head)) {
-                        stopTimeline();
-                        head.setLayoutX(head.getLayoutX() - 60 * headController.getX());
-                        head.setLayoutY(head.getLayoutY() - 60 * headController.getY());
-                        mainScene.gameOver();
-                        mainScene.getRoot().getChildren().add(resetButton);
-                        resetButton.setLayoutX(230);
-                        resetButton.setLayoutY(40);
-                    }
-
                 })
         );
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -105,22 +86,6 @@ public class Application extends javafx.application.Application {
     private void resetApplication() throws IOException{
         startMainloop();
         isTimelineStopped = false;
-    }
-    private void changeAppleLocation(ImageView apple, SnakeManager mngr) {
-        Random rand = new Random();
-        double x = rand.nextInt(9) * 60;
-        double y = rand.nextInt(1, 10) * 60 + 20;
-
-        while (mngr.containsPos(new double[]{x, y})){
-            x = rand.nextInt(9) * 60;
-            y = rand.nextInt(1, 10) * 60 + 20;
-        }
-        apple.setLayoutX(x);
-        apple.setLayoutY(y);
-    }
-
-    private boolean isCollidingHeadAndApple(Parent head, ImageView apple) {
-        return (head.getLayoutX() == apple.getLayoutX() && head.getLayoutY() == apple.getLayoutY());
     }
 
     public static void main(String[] args) {

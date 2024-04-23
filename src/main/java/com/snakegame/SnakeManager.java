@@ -30,27 +30,29 @@ public class SnakeManager {
      */
     private final LinkedList<SnakeNodeController> nodeControllers = new LinkedList<>();
 
-    private final Pane root;
+    private Pane root;
 
     //the snake head controller is used only to check for which direction the SnakeHead is looking in
     //order to update the direction of the SnakeNode
-    private final SnakeHeadController headController;
+    private SnakeHeadController headController;
 
     //this variable is used to "queue" the creation of a new SnakeNode which is done after updating
     //the position of every existing node
     private boolean toSpawn = false;
 
-    public SnakeManager(Pane root, SnakeHeadController headController) {
+    public void setRoot(Pane root) {
         this.root = root;
-        this.headController = headController;
-
     }
+    public void setHeadController(SnakeHeadController headController) {
+        this.headController = headController;
+    }
+
     public void spawnSnakeNode(){
         //this method simply means that at the end of the main-loop when updateSnake() is called, it will
         //create a new node
         toSpawn = true;
     }
-    public void updateSnake(Parent head) throws IOException {
+    public boolean updateSnake(Parent head) throws IOException {
         positions.addFirst(new double[]{head.getLayoutX(), head.getLayoutY()});
         for (int i = 0; i < nodes.size(); i++){
             setNodePosition(nodes.get(i), positions.get(i+1));
@@ -76,6 +78,14 @@ public class SnakeManager {
         else if (positions.size() > 1) {
             positions.removeLast();
         }
+
+        if (head.getLayoutX() < 0 || head.getLayoutX() >= 600 || head.getLayoutY() < 80 || head.getLayoutY() >= 680 || isCollidingHeadAndNode(head)) {
+            head.setLayoutX(head.getLayoutX() - 60 * headController.getX());
+            head.setLayoutY(head.getLayoutY() - 60 * headController.getY());
+            return false;
+        }
+
+        return true;
     }
 
     private void setNodeImageView(int index){
@@ -114,8 +124,8 @@ public class SnakeManager {
         }
         return false;
     }
-    public boolean containsPos(double[] pos){
-        return positions.stream()
-                .anyMatch(arr -> Arrays.equals(arr, pos));
+
+    public LinkedList<double[]> getPositions(){
+        return positions;
     }
 }

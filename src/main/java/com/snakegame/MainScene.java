@@ -7,6 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Random;
 
 public class MainScene {
     private final ImageView apple;
@@ -56,6 +57,13 @@ public class MainScene {
         board.setLayoutX(0);
         board.setLayoutY(80);
 
+        apple.toFront();
+        Random rand = new Random();
+        double x = rand.nextInt(9) * 60;
+        double y = rand.nextInt(1, 10) * 60 + 20;
+        apple.setLayoutX(x);
+        apple.setLayoutY(y);
+
     }
 
     public Pane getRoot(){
@@ -79,5 +87,7 @@ public class MainScene {
         root.getChildren().add(gameOver);
         gameOver.setLayoutX(100);
         gameOver.setY(200);
+
+
     }
 }
