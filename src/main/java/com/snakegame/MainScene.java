@@ -46,6 +46,10 @@ public class MainScene {
         topPanel.setLayoutX(0);
         topPanel.setLayoutY(0);
 
+        head.toFront();
+        head.setLayoutX(0);
+        head.setLayoutY(620);
+
         appleIcon.toFront();
         appleIcon.setX(30);
         appleIcon.setY(10);

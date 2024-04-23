@@ -8,17 +8,18 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class TurnProcessor {
-    private final SnakeManager snakeManager = new SnakeManager();
+    private final NodeManager snakeManager = new NodeManager();
     private final MainScene mainScene;
 
     private final ImageView apple;
     private final Parent head;
     private final CounterController counterController;
+    private final SnakeHeadController headController;
 
     public TurnProcessor(MainScene mainScene) {
         this.mainScene = mainScene;
+        this.headController = this.mainScene.getHeadController();
         snakeManager.setRoot(mainScene.getRoot());
-        snakeManager.setHeadController(mainScene.getHeadController());
         apple = this.mainScene.getApple();
         head = this.mainScene.getHead();
         counterController = this.mainScene.getCounterController();
@@ -46,7 +47,15 @@ public class TurnProcessor {
     }
     public boolean processTurn(Parent head) throws IOException {
 
-        if (!snakeManager.updateSnake(head)){
+        head.setLayoutX(Math.round((head.getLayoutX() + 60 * headController.getX()) / 10.0f)*10);
+        head.setLayoutY(Math.round((head.getLayoutY() + 60 * headController.getY()) / 10.0f)*10);
+
+        snakeManager.addFirstPosition(new double[]{head.getLayoutX(), head.getLayoutY()});
+        snakeManager.setCurrHeadDirection(headController.getDir());
+
+        if (!snakeManager.updateSnake() || head.getLayoutX() < 0 || head.getLayoutX() >= 600 || head.getLayoutY() < 80 || head.getLayoutY() >= 680){
+            head.setLayoutX(head.getLayoutX() - 60 * headController.getX());
+            head.setLayoutY(head.getLayoutY() - 60 * headController.getY());
             mainScene.gameOver();
             return false;
         }

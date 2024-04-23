@@ -5,15 +5,10 @@ import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 
-/*
-    This class manages the creation of every new node, updates their positions and images
-    the corresponding logic for the SnakeHead is handled in the SnakeHeadController class
- */
 
-public class SnakeManager {
+public class NodeManager {
 
     /*ho
     These arraylists are used to keep
@@ -21,6 +16,7 @@ public class SnakeManager {
      the instances of every single Parent object deriving from SnakeNode
      the controllers for every single SnakeNode
      */
+
     private final LinkedList<double[]> positions = new LinkedList<>();
     private final LinkedList<Parent> nodes = new LinkedList<>();
 
@@ -32,19 +28,18 @@ public class SnakeManager {
 
     private Pane root;
 
-    //the snake head controller is used only to check for which direction the SnakeHead is looking in
-    //order to update the direction of the SnakeNode
-    private SnakeHeadController headController;
-
     //this variable is used to "queue" the creation of a new SnakeNode which is done after updating
     //the position of every existing node
     private boolean toSpawn = false;
 
+    private SnakeHeadController.direction currHeadDirection;
+
     public void setRoot(Pane root) {
         this.root = root;
     }
-    public void setHeadController(SnakeHeadController headController) {
-        this.headController = headController;
+
+    public void setCurrHeadDirection(SnakeHeadController.direction dir){
+        currHeadDirection = dir;
     }
 
     public void spawnSnakeNode(){
@@ -52,8 +47,10 @@ public class SnakeManager {
         //create a new node
         toSpawn = true;
     }
-    public boolean updateSnake(Parent head) throws IOException {
-        positions.addFirst(new double[]{head.getLayoutX(), head.getLayoutY()});
+    public void addFirstPosition(double[] arr){
+        positions.addFirst(arr);
+    }
+    public boolean updateSnake() throws IOException {
         for (int i = 0; i < nodes.size(); i++){
             setNodePosition(nodes.get(i), positions.get(i+1));
             setNodeImageView(i);
@@ -62,36 +59,17 @@ public class SnakeManager {
             loadNode(positions.getLast());
             toSpawn = false;
         }
-        /*last position is removed only if size greater than 1
-        if size is greater than 1 this means one of two is true:
-            1.
-            there are no nodes.
-            it keeps the current(0) and previous(1) position of the Head.
-            The current will become previous in the next iteration of the main-loop
-            and might be used to create a new node, so we keep it
-            the previous now will not be used, so we discard it
-
-            2.
-            it keeps the positions of every node, including the previous pos of the last node,
-            we could have used it in this iteration to create a new node, but if not we discard it.
-         */
         else if (positions.size() > 1) {
             positions.removeLast();
         }
 
-        if (head.getLayoutX() < 0 || head.getLayoutX() >= 600 || head.getLayoutY() < 80 || head.getLayoutY() >= 680 || isCollidingHeadAndNode(head)) {
-            head.setLayoutX(head.getLayoutX() - 60 * headController.getX());
-            head.setLayoutY(head.getLayoutY() - 60 * headController.getY());
-            return false;
-        }
-
-        return true;
+        return !isCollidingHeadAndNode();
     }
 
     private void setNodeImageView(int index){
         SnakeNodeController currNodeController = nodeControllers.get(index);
         if (index == 0) {
-            currNodeController.setVertical(headController.getDir() == SnakeHeadController.direction.UP || headController.getDir() == SnakeHeadController.direction.DOWN);
+            currNodeController.setVertical(currHeadDirection == SnakeHeadController.direction.UP || currHeadDirection == SnakeHeadController.direction.DOWN);
         }
         else{
             currNodeController.setVertical(nodes.get(index - 1).getLayoutY() - nodes.get(index).getLayoutY() != 0);
@@ -116,9 +94,9 @@ public class SnakeManager {
         setNodePosition(node, newPos);
         setNodeImageView(nodes.size()-1);
     }
-    public boolean isCollidingHeadAndNode(Parent head) {
+    public boolean isCollidingHeadAndNode() {
         for (Parent node : nodes) {
-            if (head.getLayoutX() == node.getLayoutX() && head.getLayoutY() == node.getLayoutY()){
+            if (positions.getFirst()[0] == node.getLayoutX() && positions.getFirst()[1] == node.getLayoutY()){
                 return true;
             }
         }

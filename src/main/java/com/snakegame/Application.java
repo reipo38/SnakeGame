@@ -27,8 +27,6 @@ public class Application extends javafx.application.Application {
         Parent head = mainScene.getHead();
         SnakeHeadController headController = mainScene.getHeadController();
 
-        head.setLayoutX(0);
-        head.setLayoutY(620);
 
         Button resetButton = new Button("Start Again");
         resetButton.setOnAction(event -> {
@@ -48,14 +46,6 @@ public class Application extends javafx.application.Application {
         timeline = new Timeline(
 
                 new KeyFrame(Duration.seconds(0.70), event -> {
-                    /*
-                    getLayoutX and Y return double, not int
-                    because operations with floating point numbers aren't always as precise as needed
-                    there is logic for rounding to the closest number, divisible by ten
-                    */
-
-                    head.setLayoutX(Math.round((head.getLayoutX() + 60 * headController.getX()) / 10.0f)*10);
-                    head.setLayoutY(Math.round((head.getLayoutY() + 60 * headController.getY()) / 10.0f)*10);
 
                     headController.unlockMovement();
                     scene.setOnKeyPressed(headController::handleKeyPressed);
