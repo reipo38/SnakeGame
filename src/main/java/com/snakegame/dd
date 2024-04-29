@@ -1,0 +1,30 @@
+/*
+                double diffX;
+                double diffY;
+                 /*
+                if (prevNode.controller().getVertical()){
+                    diffX = nextNode.node().getLayoutX() - currNode.node().getLayoutX();
+                    diffY = prevNode.node().getLayoutY() - currNode.node().getLayoutY();
+                } else {
+                    diffX = prevNode.node().getLayoutX() - currNode.node().getLayoutX();
+                    diffY = nextNode.node().getLayoutY() - currNode.node().getLayoutY();
+                }
+
+
+
+                diffX = currNode.node().getLayoutX() - prevNode.node().getLayoutX();
+                diffY = nextNode.node().getLayoutY() - currNode.node().getLayoutY();
+                if (diffX > 0){
+                    if (diffY > 0){
+                        prevNode.controller().setTurn(SnakeNodeController.turning.RIGHTDOWN);
+                    } else {
+                        prevNode.controller().setTurn(SnakeNodeController.turning.RIGHTUP);
+                    }
+                } else {
+                    if (diffY > 0){
+                        prevNode.controller().setTurn(SnakeNodeController.turning.LEFTDOWN);
+                    } else {
+                        prevNode.controller().setTurn(SnakeNodeController.turning.LEFTUP);
+                    }
+                }
+                */

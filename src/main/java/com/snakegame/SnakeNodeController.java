@@ -1,7 +1,6 @@
 package com.snakegame;
 
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -9,8 +8,6 @@ import java.util.Objects;
 
 public class SnakeNodeController {
 
-    @FXML
-    private Parent parent;
     @FXML
     private ImageView imageView;
 
@@ -25,6 +22,8 @@ public class SnakeNodeController {
     private final Image rightUp = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-right-up.png")));
     private final Image leftDown = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-left-down.png")));
     private final Image rightDown = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-right-down.png")));
+
+    Image test = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/test.png")));
 
     private boolean isVertical;
 
@@ -44,7 +43,7 @@ public class SnakeNodeController {
         LEFTDOWN,
         RIGHTDOWN
     }
-
+/*
     public void setImageView() {
         switch (turn){
             case turning.NONE -> {
@@ -59,13 +58,28 @@ public class SnakeNodeController {
             case LEFTDOWN -> imageView.setImage(leftDown);
             case RIGHTDOWN -> imageView.setImage(rightDown);
         }
+    }
 
 
+ */
+    public void setImageView() {
+        if (turn == turning.NONE){
+            if (isVertical) {
+                imageView.setImage(vertical);
+            } else {
+                imageView.setImage(horizontal);
+            }
+        } else {
+            imageView.setImage(test);
+        }
+        //turn = turning.NONE;
     }
-    public Parent getParent(){
-        return parent;
-    }
+
+
     public void setTurn(turning turn){
         this.turn = turn;
+    }
+    public turning getTurn(){
+        return turn;
     }
 }

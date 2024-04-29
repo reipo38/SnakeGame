@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
@@ -70,22 +71,27 @@ public class MainScene {
 
     }
 
-    public Pane getRoot(){
+    public Pane getRoot() {
         return root;
     }
-    public Parent getHead(){
+
+    public Parent getHead() {
         return head;
     }
-    public SnakeHeadController getHeadController(){
+
+    public SnakeHeadController getHeadController() {
         return headController;
     }
+
     public ImageView getApple() {
         return apple;
     }
-    public CounterController getCounterController(){
+
+    public CounterController getCounterController() {
         return counterController;
     }
-    public void gameOver(){
+
+    public void gameOver() {
         ImageView gameOver = new ImageView();
         gameOver.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/game-over.png"))));
         root.getChildren().add(gameOver);
