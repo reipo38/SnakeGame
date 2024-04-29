@@ -19,7 +19,7 @@ public class Application extends javafx.application.Application {
         this.stage = stage;
         startMainloop();
     }
-    
+
     private void startMainloop() throws IOException {
         MainScene mainScene = new MainScene();
         Scene scene = new Scene(mainScene.getRoot(), 600, 680);

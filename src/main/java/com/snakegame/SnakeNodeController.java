@@ -17,13 +17,11 @@ public class SnakeNodeController {
 
     private final Image vertical = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-vertical.png")));
     private final Image horizontal = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-horizontal.png")));
-    
+
     private final Image leftUp = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-left-up.png")));
     private final Image rightUp = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-right-up.png")));
     private final Image leftDown = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-left-down.png")));
     private final Image rightDown = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/snake-body-right-down.png")));
-
-    Image test = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/test.png")));
 
     private boolean isVertical;
 
@@ -32,20 +30,21 @@ public class SnakeNodeController {
     public void setVertical(boolean isVertical) {
         this.isVertical = isVertical;
     }
-    public boolean getVertical(){
+
+    public boolean getVertical() {
         return isVertical;
     }
 
-    public enum turning{
+    public enum turning {
         NONE,
         LEFTUP,
         RIGHTUP,
         LEFTDOWN,
         RIGHTDOWN
     }
-/*
+
     public void setImageView() {
-        switch (turn){
+        switch (turn) {
             case turning.NONE -> {
                 if (isVertical) {
                     imageView.setImage(vertical);
@@ -60,26 +59,7 @@ public class SnakeNodeController {
         }
     }
 
-
- */
-    public void setImageView() {
-        if (turn == turning.NONE){
-            if (isVertical) {
-                imageView.setImage(vertical);
-            } else {
-                imageView.setImage(horizontal);
-            }
-        } else {
-            imageView.setImage(test);
-        }
-        //turn = turning.NONE;
-    }
-
-
-    public void setTurn(turning turn){
+    public void setTurn(turning turn) {
         this.turn = turn;
-    }
-    public turning getTurn(){
-        return turn;
     }
 }
