@@ -1,8 +1,12 @@
+com/snakegame/MainScene.class
+com/snakegame/SnakeHeadController.class
+com/snakegame/SnakeNodeWrapper.class
+com/snakegame/SnakeNodeController.class
+com/snakegame/SnakeNodeController$turning.class
+module-info.class
+com/snakegame/CounterController.class
 com/snakegame/Application.class
 com/snakegame/SnakeHeadController$direction.class
-com/snakegame/SnakeHeadController.class
-com/snakegame/SnakeManager.class
+com/snakegame/SnakeNodeManager.class
 com/snakegame/SnakeHeadController$1.class
-module-info.class
-com/snakegame/Controller.class
-com/snakegame/SnakeNode.class
+com/snakegame/TurnProcessor.class
