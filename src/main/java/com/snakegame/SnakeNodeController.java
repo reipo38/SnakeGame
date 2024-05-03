@@ -45,7 +45,7 @@ public class SnakeNodeController {
 
     public void setImageView() {
         switch (turn) {
-            case NONE -> { // java: an enum switch case label must be the unqualified name of an enumeration constant; turning.NONE -> NONE
+            case NONE -> {
                 if (isVertical) {
                     imageView.setImage(vertical);
                 } else {
