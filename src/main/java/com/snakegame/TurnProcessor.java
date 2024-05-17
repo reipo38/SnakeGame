@@ -33,20 +33,16 @@ public class TurnProcessor {
         return head.getLayoutX() < 0 || head.getLayoutX() >= 600 || head.getLayoutY() < 80 || head.getLayoutY() >= 680;
     }
 
-    private boolean containsPos(double[] pos) {
-        return snakeNodeManager.getPositions().stream()
-                .anyMatch(arr -> Arrays.equals(arr, pos));
-    }
-
     private void changeAppleLocation() {
         Random rand = new Random();
-        double x = rand.nextInt(9) * 60;
-        double y = rand.nextInt(1, 10) * 60 + 20;
+        int x = rand.nextInt(9) * 60;
+        int y = rand.nextInt(1, 10) * 60 + 20;
 
-        while (containsPos(new double[]{x, y})) {
+        while (snakeNodeManager.getPositions().contains(Arrays.toString(new int[]{x, y}))) {
             x = rand.nextInt(9) * 60;
             y = rand.nextInt(1, 10) * 60 + 20;
         }
+
         apple.setLayoutX(x);
         apple.setLayoutY(y);
     }
@@ -60,10 +56,9 @@ public class TurnProcessor {
         head.setLayoutX(Math.round((head.getLayoutX() + 60 * headController.getX()) / 10.0f) * 10);
         head.setLayoutY(Math.round((head.getLayoutY() + 60 * headController.getY()) / 10.0f) * 10);
 
-        snakeNodeManager.getPositions().addFirst(new double[]{head.getLayoutX(), head.getLayoutY()});
         snakeNodeManager.setCurrHeadDirection(headController.getDir());
 
-        if (!snakeNodeManager.updateNodes() || isCollidingWithBorder()) {
+        if (!snakeNodeManager.updateNodes(new int[]{(int) head.getLayoutX(), (int) head.getLayoutY()}) || isCollidingWithBorder()) {
             head.setLayoutX(head.getLayoutX() - 60 * headController.getX());
             head.setLayoutY(head.getLayoutY() - 60 * headController.getY());
             mainScene.gameOver();

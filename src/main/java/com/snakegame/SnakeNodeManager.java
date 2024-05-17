@@ -5,17 +5,14 @@ import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 
 public class SnakeNodeManager {
 
-    //in reality only the first two elements are used
-    // 0 - current head position
-    // 1 - previous head position and current currNode position
-    //it  contains the positions for every other node as well but the only purpose they serve is to prevent the apple from spawning under the snake
-    //the logic for that is implemented in TurnProcessor
-    private final LinkedList<double[]> positions = new LinkedList<>();
+    HashSet<String> positions = new HashSet<>();
 
     //FIFO structure, implemented with a LinkedList
     private final LinkedList<SnakeNodeWrapper> nodeWrappers = new LinkedList<>();
@@ -23,6 +20,9 @@ public class SnakeNodeManager {
     private Pane root;
     private boolean toSpawn = false;
     private SnakeHeadController.direction currHeadDirection;
+
+    private int[] prevHeadPos;
+    private int[] currHeadPos;
 
     public void setRoot(Pane root) {
         this.root = root;
@@ -38,42 +38,35 @@ public class SnakeNodeManager {
 
     //updateNodes returns false to indicate the head has collided with the body.
     //first thing the method does is check if a new Node is needed, if so, calls loadNode, which places the new node at the end of the list
-    //removes last position because no node occupies it anymore
-    //all movement of the snake is implemented by removing the last node and putting it on the previous pos of head (positions[1])
+    //all movement of the snake is implemented by removing the last node and putting it on the previous pos of head (prevHeadPos)
     //this is why loadNode() adds the new node last
-    public boolean updateNodes() throws IOException {
-
+    public boolean updateNodes(int[] currHeadPos) throws IOException {
+        this.currHeadPos = currHeadPos;
         if (toSpawn) {
             loadNode();
             toSpawn = false;
-        } else if (positions.size() > 1) {
-            positions.removeLast();
         }
         if (!nodeWrappers.isEmpty()) {
             //the last node is removed and appendedFirst, because it is the only node that should change its position
+            //the node's position is removed from the positions set before being updated and added again, unless a new node will be spawned. In that case, the position is kept,
+            //because the new node will occupy it
             SnakeNodeWrapper currNode = nodeWrappers.removeLast();
+            if (!toSpawn) {
+                positions.remove(Arrays.toString(new int[]{(int) currNode.node().getLayoutX(), (int) currNode.node().getLayoutY()}));
+            }
             nodeWrappers.addFirst(currNode);
-            setNodePosition(currNode.node(), positions.get(1));
-
+            setNodePosition(currNode.node(), prevHeadPos);
+            positions.add(Arrays.toString(prevHeadPos));
             resolveAndSetNodeImageView();
         }
-
-        return !isCollidingHeadAndNode();
-    }
-
-    //SnakeNodeManager does not have access to head, instead it checks the node positions against the first el of positions which is ALWAYS the head position
-    public boolean isCollidingHeadAndNode() {
-        for (SnakeNodeWrapper nodeWrapper : nodeWrappers) {
-            if (positions.getFirst()[0] == nodeWrapper.node().getLayoutX() && positions.getFirst()[1] == nodeWrapper.node().getLayoutY()) {
-                return true;
-            }
-        }
-        return false;
+        prevHeadPos = this.currHeadPos;
+        return !positions.contains(Arrays.toString(this.currHeadPos));
     }
 
     //TurnProcessor requires positions in order to add the position of the head
     //AND to NOT spawn the apple under the snake
-    public LinkedList<double[]> getPositions() {
+
+    public HashSet<String> getPositions() {
         return positions;
     }
 
@@ -86,15 +79,15 @@ public class SnakeNodeManager {
         if (nodeWrappers.size() > 1) {
             SnakeNodeWrapper nextNode = nodeWrappers.get(1);
             if (isHeadVertical != nextNode.controller().getVertical()) {
-                double headX = positions.getFirst()[0], headY = positions.getFirst()[1];
-                double diffX, diffY;
+                int headX = currHeadPos[0], headY = currHeadPos[1];
+                int diffX, diffY;
 
                 if (isHeadVertical) {
-                    diffX = nextNode.node().getLayoutX() - currNode.node().getLayoutX();
-                    diffY = headY - currNode.node().getLayoutY();
+                    diffX = (int) nextNode.node().getLayoutX() - (int) currNode.node().getLayoutX();
+                    diffY = headY - (int) currNode.node().getLayoutY();
                 } else {
-                    diffX = headX - currNode.node().getLayoutX();
-                    diffY = nextNode.node().getLayoutY() - currNode.node().getLayoutY();
+                    diffX = headX - (int) currNode.node().getLayoutX();
+                    diffY = (int) nextNode.node().getLayoutY() - (int) currNode.node().getLayoutY();
                 }
 
                 if (diffX > 0) {
@@ -108,12 +101,12 @@ public class SnakeNodeManager {
 
     }
 
-    private void setNodePosition(Parent node, double[] newPos) {
+    private void setNodePosition(Parent node, int[] newPos) {
         node.setLayoutX(newPos[0]);
         node.setLayoutY(newPos[1]);
     }
 
-    //when loadNoad() is called it places the new node at the end of the list, so that it is the first that gets updated in updateNodes()
+    //when loadNode() is called it places the new node at the end of the list, so that it is the first that gets updated in updateNodes()
     private void loadNode() throws IOException {
         FXMLLoader nodeLoader = new FXMLLoader(getClass().getResource("/com/snakegame/SnakeNode.fxml"));
         SnakeNodeWrapper node = new SnakeNodeWrapper(nodeLoader.load(), nodeLoader.getController());

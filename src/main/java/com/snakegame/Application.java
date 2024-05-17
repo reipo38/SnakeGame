@@ -12,7 +12,7 @@ import java.io.IOException;
 public class Application extends javafx.application.Application {
     private Timeline timeline;
     private Stage stage;
-    private static boolean isTimelineStopped = false;
+    private static boolean isTimelineStopped;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -28,17 +28,20 @@ public class Application extends javafx.application.Application {
         Button resetButton = new Button("Start Again");
         resetButton.setOnAction(event -> {
             try {
-                resetApplication();
+                startMainloop();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
 
+        //processes everything happening in one iteration of the mainloop
+        //handles collision detection and apple location
         TurnProcessor turnProcessor = new TurnProcessor(mainScene);
 
         stage.setTitle("The Snake Game");
         stage.setScene(scene);
         stage.show();
+        isTimelineStopped = false;
         timeline = new Timeline(
                 new KeyFrame(Duration.seconds(0.70), event -> {
 
@@ -68,11 +71,6 @@ public class Application extends javafx.application.Application {
     private void stopTimeline() {
         timeline.stop();
         isTimelineStopped = true;
-    }
-
-    private void resetApplication() throws IOException {
-        startMainloop();
-        isTimelineStopped = false;
     }
 
     public static void main(String[] args) {

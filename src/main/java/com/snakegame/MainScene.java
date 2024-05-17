@@ -64,8 +64,8 @@ public class MainScene {
 
         apple.toFront();
         Random rand = new Random();
-        double x = rand.nextInt(9) * 60;
-        double y = rand.nextInt(1, 10) * 60 + 20;
+        int x = rand.nextInt(9) * 60;
+        int y = rand.nextInt(1, 10) * 60 + 20;
         apple.setLayoutX(x);
         apple.setLayoutY(y);
 
