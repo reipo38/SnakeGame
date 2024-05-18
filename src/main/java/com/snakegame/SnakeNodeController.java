@@ -45,7 +45,7 @@ public class SnakeNodeController {
 
     public void setImageView() {
         switch (turn) {
-            case turning.NONE -> {
+            case NONE -> {
                 if (isVertical) {
                     imageView.setImage(vertical);
                 } else {
