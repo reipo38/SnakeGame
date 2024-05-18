@@ -38,7 +38,7 @@ public class TurnProcessor {
         int x = rand.nextInt(9) * 60;
         int y = rand.nextInt(1, 10) * 60 + 20;
 
-        while (snakeNodeManager.getPositions().contains(Arrays.toString(new int[]{x, y}))) {
+        while (snakeNodeManager.getPositions().contains(x*1000 + y)) {
             x = rand.nextInt(9) * 60;
             y = rand.nextInt(1, 10) * 60 + 20;
         }
@@ -58,7 +58,7 @@ public class TurnProcessor {
 
         snakeNodeManager.setCurrHeadDirection(headController.getDir());
 
-        if (!snakeNodeManager.updateNodes(new int[]{(int) head.getLayoutX(), (int) head.getLayoutY()}) || isCollidingWithBorder()) {
+        if (!snakeNodeManager.updateNodes((int) head.getLayoutX(), (int) head.getLayoutY()) || isCollidingWithBorder()) {
             head.setLayoutX(head.getLayoutX() - 60 * headController.getX());
             head.setLayoutY(head.getLayoutY() - 60 * headController.getY());
             mainScene.gameOver();

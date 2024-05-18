@@ -19,10 +19,10 @@ public class MainScene {
 
     public MainScene() throws IOException {
         ImageView topPanel = new ImageView();
-        topPanel.setImage(new Image(Objects.requireNonNull(getClass().getResource("/images/top-panel.png")).toExternalForm()));
+        topPanel.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/top-panel.png"))));
 
         ImageView board = new ImageView();
-        board.setImage(new Image(Objects.requireNonNull(getClass().getResource("/images/board.png")).toExternalForm()));
+        board.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/board.png"))));
 
         ImageView appleIcon = new ImageView();
         appleIcon.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/apple.png"))));
