@@ -4,7 +4,6 @@ import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Random;
 
 public class TurnProcessor {

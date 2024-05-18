@@ -13,7 +13,7 @@ public class SnakeNodeManager {
 
     //HashSet containing every position in format XXXYYY
     //Meaning to get X you divide the whole number by 1000 and for Y modular divide by 1000
-    HashSet<Integer> positions = new HashSet<>();
+    private final HashSet<Integer> positions = new HashSet<>();
 
     //FIFO structure, implemented with a LinkedList
     private final LinkedList<SnakeNodeWrapper> nodeWrappers = new LinkedList<>();
